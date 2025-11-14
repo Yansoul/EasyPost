@@ -1,3 +1,5 @@
+import { Button, Card, CardBody } from "@heroui/react";
+
 export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -5,29 +7,38 @@ export default function Home() {
         <h1 className="text-4xl font-bold text-center sm:text-left">
           Welcome to Media Auto Demo
         </h1>
-        <p className="text-center sm:text-left text-sm">
-          Get started by editing{" "}
-          <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-            app/page.tsx
-          </code>
-        </p>
+        <Card className="max-w-md">
+          <CardBody>
+            <p className="text-center sm:text-left text-sm">
+              Get started by editing{" "}
+              <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
+                app/page.tsx
+              </code>
+            </p>
+            <p className="text-sm text-default-500 mt-2">
+              This project is now powered by HeroUI components!
+            </p>
+          </CardBody>
+        </Card>
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+          <Button
+            as="a"
+            color="primary"
             href="https://nextjs.org/docs"
             target="_blank"
             rel="noopener noreferrer"
           >
             Read our docs
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://vercel.com/new"
+          </Button>
+          <Button
+            as="a"
+            variant="bordered"
+            href="https://heroui.com"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Deploy now
-          </a>
+            HeroUI Docs
+          </Button>
         </div>
       </main>
     </div>

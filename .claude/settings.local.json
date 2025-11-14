@@ -3,7 +3,12 @@
     "allow": [
       "Bash(npx create-next-app@latest . --typescript --tailwind --app --no-src-dir --import-alias \"@/*\" --eslint)",
       "Bash(npx create-next-app:*)",
-      "Bash(pnpm install:*)"
+      "Bash(pnpm install:*)",
+      "WebSearch",
+      "WebFetch(domain:www.heroui.com)",
+      "WebFetch(domain:heroui.com)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm build:*)"
     ],
     "deny": [],
     "ask": []
