@@ -19,7 +19,6 @@ import { motion, AnimatePresence } from "framer-motion";
 type Industry = {
   id: string;
   name: string;
-  icon?: string;
 };
 
 type Niche = {
@@ -45,12 +44,6 @@ export default function Home() {
     loadIndustries();
   }, []);
 
-  useEffect(() => {
-    if (selectedIndustry) {
-      // 行业变化时自动加载赛道，显示 loading
-      fetchNiches(selectedIndustry);
-    }
-  }, [selectedIndustry]);
 
   // 初始加载行业列表（无 loading 状态）
   const loadIndustries = async () => {
@@ -58,16 +51,16 @@ export default function Home() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 300));
       const mockIndustries: Industry[] = [
-        { id: "life", name: "生活", icon: "🏠" },
-        { id: "food", name: "美食", icon: "🍔" },
-        { id: "travel", name: "旅行", icon: "✈️" },
-        { id: "tech", name: "科技", icon: "💻" },
-        { id: "fashion", name: "时尚", icon: "👗" },
-        { id: "education", name: "教育", icon: "📚" },
-        { id: "finance", name: "财经", icon: "💰" },
-        { id: "health", name: "健康", icon: "💪" },
-        { id: "entertainment", name: "娱乐", icon: "🎬" },
-        { id: "sports", name: "体育", icon: "⚽" },
+        { id: "life", name: "生活" },
+        { id: "food", name: "美食" },
+        { id: "travel", name: "旅行" },
+        { id: "tech", name: "科技" },
+        { id: "fashion", name: "时尚" },
+        { id: "education", name: "教育" },
+        { id: "finance", name: "财经" },
+        { id: "health", name: "健康" },
+        { id: "entertainment", name: "娱乐" },
+        { id: "sports", name: "体育" },
       ];
       setIndustries(mockIndustries);
     } catch (err) {
@@ -162,6 +155,7 @@ export default function Home() {
         setError("请先选择一个行业");
         return;
       }
+      fetchNiches(selectedIndustry);
       setCurrentStep(2);
       setError("");
     } else if (currentStep === 2) {
@@ -245,9 +239,6 @@ export default function Home() {
                     isActive ? "text-success dark:text-success-400" : "text-gray-500 dark:text-gray-400"
                   }`}>
                     {step}
-                    {isOptional && isActive && (
-                      <span className="block text-[10px] mt-1 opacity-80">可选</span>
-                    )}
                   </div>
                 </div>
               );
@@ -298,9 +289,8 @@ export default function Home() {
                     >
                       {industries.map((industry) => (
                         <SelectItem key={industry.id} textValue={industry.name}>
-                          <div className="flex items-center">
-                            <span className="mr-2">{industry.icon}</span>
-                            <span>{industry.name}</span>
+                          <div className="py-1">
+                            <span className="text-base font-medium text-gray-900 dark:text-gray-100">{industry.name}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -346,10 +336,10 @@ export default function Home() {
                     >
                       {niches.map((niche) => (
                         <SelectItem key={niche.id} textValue={niche.name}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{niche.name}</span>
+                          <div className="flex flex-col gap-1 py-1">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">{niche.name}</span>
                             {niche.description && (
-                              <span className="text-sm text-gray-500">{niche.description}</span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">{niche.description}</span>
                             )}
                           </div>
                         </SelectItem>
@@ -365,10 +355,10 @@ export default function Home() {
                         返回
                       </Button>
                       <Button
-                        color="primary"
+                        color="success"
                         size="lg"
                         onPress={handleNextStep}
-                        className="w-full sm:w-auto"
+                        className="w-full sm:w-auto text-white"
                       >
                         下一步
                       </Button>
@@ -382,7 +372,6 @@ export default function Home() {
                   <CardHeader className="flex flex-col items-start">
                     <div className="flex items-center gap-3">
                       <h2 className="text-2xl font-bold">输入历史视频文案词稿（可选）</h2>
-                      <Chip color="success" variant="flat" size="sm" className="text-xs">可选</Chip>
                     </div>
                     <p className="text-gray-600 dark:text-gray-400 mt-2">
                       提供您已发布的视频文案词稿，AI 将学习您的风格和特点，生成更符合您账号风格的选题建议
@@ -398,23 +387,53 @@ export default function Home() {
                       </div>
                     )}
                     <div className="space-y-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">请复制1-3个您已发布视频的代表性文案：</p>
-                      {contentScripts.map((script, index) => (
-                        <Textarea
-                          key={index}
-                          label={`文案词稿 ${index + 1}（${script.length}/500）`}
-                          placeholder="请输入视频文案内容..."
-                          value={script}
-                          onValueChange={(value) => {
-                            const newScripts = [...contentScripts];
-                            newScripts[index] = value.slice(0, 500);
-                            setContentScripts(newScripts);
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">请复制您已发布视频的代表性文案：</p>
+                        <Button
+                          size="sm"
+                          color="success"
+                          variant="flat"
+                          onPress={() => {
+                            if (contentScripts.length < 10) {
+                              setContentScripts([...contentScripts, ""]);
+                            }
                           }}
-                          maxLength={500}
-                          minRows={4}
-                          maxRows={8}
-                          className="w-full"
-                        />
+                          isDisabled={contentScripts.length >= 10}
+                        >
+                          + 添加文案
+                        </Button>
+                      </div>
+                      {contentScripts.map((script, index) => (
+                        <div key={index} className="relative">
+                          <Textarea
+                            label={`文案词稿 ${index + 1}（${script.length}/500）`}
+                            placeholder="请输入视频文案内容..."
+                            value={script}
+                            onValueChange={(value) => {
+                              const newScripts = [...contentScripts];
+                              newScripts[index] = value.slice(0, 500);
+                              setContentScripts(newScripts);
+                            }}
+                            maxLength={500}
+                            minRows={4}
+                            maxRows={8}
+                            className="w-full"
+                          />
+                          {contentScripts.length > 1 && (
+                            <button
+                              onClick={() => {
+                                const newScripts = contentScripts.filter((_, i) => i !== index);
+                                setContentScripts(newScripts);
+                              }}
+                              className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all opacity-60 hover:opacity-100"
+                              title="删除此文案"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
                       ))}
                       <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
                         <p className="text-sm text-emerald-700 dark:text-emerald-400">
@@ -433,14 +452,13 @@ export default function Home() {
                         返回
                       </Button>
                       <Button
-                        variant="flat"
-                        color="success"
+                        variant="light"
                         size="lg"
                         onPress={() => {
                           setContentScripts(["", "", ""]);
                           handleNextStep();
                         }}
-                        className="w-full sm:w-auto"
+                        className="w-full sm:w-auto text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                       >
                         跳过此步骤
                       </Button>
