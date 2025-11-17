@@ -56,16 +56,16 @@ export default function Home() {
   // 初始加载行业列表（无 loading 状态）
   const loadIndustries = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch("/api/categories");
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('✅ API 调用成功:', data);
+      // console.log("✅ API 调用成功:", data);
       setCategoryData(data.niches || {});
       setIndustries(data.industry || []);
     } catch (err) {
-      console.error('❌ 加载分类失败:', err);
+      // console.error("❌ 加载分类失败:", err);
       setError("获取行业数据失败，请稍后重试");
     }
   };
@@ -75,22 +75,22 @@ export default function Home() {
     setLoading(true);
     setError("");
     try {
-      console.log('=== loadNiches 调试 ===');
-      console.log('传入的 industryName:', industryName);
-      console.log('categoryData 对象:', categoryData);
+      // console.log("=== loadNiches 调试 ===");
+      // console.log("传入的 industryName:", industryName);
+      // console.log("categoryData 对象:", categoryData);
       const nicheData = categoryData[industryName] || [];
-      console.log('找到的 nicheData:', nicheData);
+      // console.log("找到的 nicheData:", nicheData);
 
-      const nicheList: Niche[] = nicheData.map(item => ({
+      const nicheList: Niche[] = nicheData.map((item) => ({
         id: item.id,
         name: item.name,
         description: item.name,
       }));
-      console.log('转换后的 nicheList:', nicheList);
+      // console.log("转换后的 nicheList:", nicheList);
       setNiches(nicheList);
     } catch (err) {
       setError("获取赛道数据失败");
-      console.error('加载赛道失败:', err);
+      // console.error("加载赛道失败:", err);
     } finally {
       setLoading(false);
     }
@@ -102,8 +102,8 @@ export default function Home() {
         setError("请先选择一个行业");
         return;
       }
-      const industry = industries.find(i => i.id === selectedIndustry);
-      if(industry) {
+      const industry = industries.find((i) => i.id === selectedIndustry);
+      if (industry) {
         setSelectedIndustryName(industry.name);
         loadNiches(industry.name);
       }
@@ -185,9 +185,13 @@ export default function Home() {
                   >
                     {index + 1}
                   </div>
-                  <div className={`text-xs mt-2 text-center font-medium max-w-20 ${
-                    isActive ? "text-success dark:text-success-400" : "text-gray-500 dark:text-gray-400"
-                  }`}>
+                  <div
+                    className={`text-xs mt-2 text-center font-medium max-w-20 ${
+                      isActive
+                        ? "text-success dark:text-success-400"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
                     {step}
                   </div>
                 </div>
@@ -215,7 +219,9 @@ export default function Home() {
               {!loading && currentStep === 1 && (
                 <>
                   <CardHeader className="flex flex-col items-start">
-                    <h2 className="text-2xl font-bold">第一步：选择您的行业领域</h2>
+                    <h2 className="text-2xl font-bold">
+                      第一步：选择您的行业领域
+                    </h2>
                     <p className="text-gray-600 dark:text-gray-400 mt-2">
                       请选择您的自媒体账号所属的行业领域
                     </p>
@@ -240,7 +246,9 @@ export default function Home() {
                       {industries.map((industry) => (
                         <SelectItem key={industry.id} textValue={industry.name}>
                           <div className="py-1">
-                            <span className="text-base font-medium text-gray-900 dark:text-gray-100">{industry.name}</span>
+                            <span className="text-base font-medium text-gray-900 dark:text-gray-100">
+                              {industry.name}
+                            </span>
                           </div>
                         </SelectItem>
                       ))}
@@ -287,9 +295,13 @@ export default function Home() {
                       {niches.map((niche) => (
                         <SelectItem key={niche.id} textValue={niche.name}>
                           <div className="flex flex-col gap-1 py-1">
-                            <span className="font-medium text-gray-900 dark:text-gray-100">{niche.name}</span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {niche.name}
+                            </span>
                             {niche.description && (
-                              <span className="text-sm text-gray-600 dark:text-gray-400">{niche.description}</span>
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {niche.description}
+                              </span>
                             )}
                           </div>
                         </SelectItem>
@@ -321,10 +333,13 @@ export default function Home() {
                 <>
                   <CardHeader className="flex flex-col items-start">
                     <div className="flex items-center gap-3">
-                      <h2 className="text-2xl font-bold">输入历史视频文案词稿（可选）</h2>
+                      <h2 className="text-2xl font-bold">
+                        输入历史视频文案词稿（可选）
+                      </h2>
                     </div>
                     <p className="text-gray-600 dark:text-gray-400 mt-2">
-                      提供您已发布的视频文案词稿，AI 将学习您的风格和特点，生成更符合您账号风格的选题建议
+                      提供您已发布的视频文案词稿，AI
+                      将学习您的风格和特点，生成更符合您账号风格的选题建议
                     </p>
                   </CardHeader>
                   <Divider />
@@ -338,7 +353,9 @@ export default function Home() {
                     )}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">请复制您已发布视频的代表性文案：</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          请复制您已发布视频的代表性文案：
+                        </p>
                         <Button
                           size="sm"
                           color="success"
@@ -356,7 +373,9 @@ export default function Home() {
                       {contentScripts.map((script, index) => (
                         <div key={index} className="relative">
                           <Textarea
-                            label={`文案词稿 ${index + 1}（${script.length}/500）`}
+                            label={`文案词稿 ${index + 1}（${
+                              script.length
+                            }/500）`}
                             placeholder="请输入视频文案内容..."
                             value={script}
                             onValueChange={(value) => {
@@ -372,14 +391,27 @@ export default function Home() {
                           {contentScripts.length > 1 && (
                             <button
                               onClick={() => {
-                                const newScripts = contentScripts.filter((_, i) => i !== index);
+                                const newScripts = contentScripts.filter(
+                                  (_, i) => i !== index
+                                );
                                 setContentScripts(newScripts);
                               }}
                               className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300 transition-all opacity-60 hover:opacity-100"
                               title="删除此文案"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
                               </svg>
                             </button>
                           )}
@@ -388,7 +420,8 @@ export default function Home() {
                       <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
                         <p className="text-sm text-emerald-700 dark:text-emerald-400">
                           <span className="font-semibold">💡 小贴士：</span>
-                          选择最能代表您账号风格的文案，包含开头钩子、中间内容和结尾引导语，这样 AI 能更好地学习您的独特风格
+                          选择最能代表您账号风格的文案，包含开头钩子、中间内容和结尾引导语，这样
+                          AI 能更好地学习您的独特风格
                         </p>
                       </div>
                     </div>
@@ -438,19 +471,29 @@ export default function Home() {
                     <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mb-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">行业领域</p>
-                          <p className="font-medium">{getIndustryName(selectedIndustry)}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            行业领域
+                          </p>
+                          <p className="font-medium">
+                            {getIndustryName(selectedIndustry)}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">细分赛道</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            细分赛道
+                          </p>
                           <p className="font-medium">
                             {niches.find((n) => n.id === selectedNiche)?.name}
                           </p>
                         </div>
-                        {contentScripts.some(s => s.trim()) && (
+                        {contentScripts.some((s) => s.trim()) && (
                           <div className="sm:col-span-2">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">已提供文案样本</p>
-                            <p className="font-medium text-success">{contentScripts.filter(s => s.trim()).length} 个</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              已提供文案样本
+                            </p>
+                            <p className="font-medium text-success">
+                              {contentScripts.filter((s) => s.trim()).length} 个
+                            </p>
                           </div>
                         )}
                       </div>
