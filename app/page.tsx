@@ -47,7 +47,9 @@ export default function Home() {
   const [niches, setNiches] = useState<Niche[]>([]);
   const [categoryData, setCategoryData] = useState<CategoryData>({});
   const [loading, setLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [jobId, setJobId] = useState<string>("");
 
   useEffect(() => {
     loadIndustries();
@@ -129,11 +131,64 @@ export default function Home() {
     }
   };
 
-  const handleComplete = () => {
-    console.log("用户选择:", {
-      industry: selectedIndustry,
-      niche: selectedNiche,
-    });
+  const handleComplete = async () => {
+    setIsGenerating(true);
+    setError("");
+    setJobId("");
+
+    try {
+      // 构建 trackData
+      const nicheName = niches.find((n) => n.id === selectedNiche)?.name || "";
+
+      const requestData = {
+        trackData: [
+          {
+            tag: {
+              children: [
+                {
+                  label: nicheName,
+                  value: parseInt(selectedNiche),
+                }
+              ],
+              count: 0,
+              label: selectedIndustryName,
+              value: parseInt(selectedIndustry),
+            }
+          }
+        ],
+        userHistory: contentScripts.filter((s) => s.trim()),
+      };
+
+      console.log("发送请求数据:", requestData);
+
+      const response = await fetch("http://localhost:5678/webhook-test/topic-helper", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("API 响应:", result);
+
+      if (result.status === "processing_started" && result.jobId) {
+        setJobId(result.jobId);
+        // 这里可以导航到结果页面或显示成功消息
+        alert(`✅ ${result.message}\n任务ID: ${result.jobId}`);
+      } else {
+        throw new Error("无效的响应格式");
+      }
+    } catch (err) {
+      console.error("❌ 获取选题建议失败:", err);
+      setError("获取选题建议失败，请稍后重试");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const getIndustryName = (id: string) => {
@@ -375,15 +430,15 @@ export default function Home() {
                           <Textarea
                             label={`文案词稿 ${index + 1}（${
                               script.length
-                            }/500）`}
+                            }/2000）`}
                             placeholder="请输入视频文案内容..."
                             value={script}
                             onValueChange={(value) => {
                               const newScripts = [...contentScripts];
-                              newScripts[index] = value.slice(0, 500);
+                              newScripts[index] = value.slice(0, 2000);
                               setContentScripts(newScripts);
                             }}
-                            maxLength={500}
+                            maxLength={2000}
                             minRows={4}
                             maxRows={8}
                             className="w-full"
@@ -468,36 +523,65 @@ export default function Home() {
                   </CardHeader>
                   <Divider />
                   <CardBody>
-                    <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mb-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            行业领域
-                          </p>
-                          <p className="font-medium">
-                            {getIndustryName(selectedIndustry)}
-                          </p>
+                    {isGenerating && (
+                      <div className="py-8 flex flex-col items-center justify-center">
+                        <Spinner size="lg" color="success" />
+                        <p className="mt-4 text-gray-600 dark:text-gray-300">
+                          正在分析您的领域，生成选题建议...
+                        </p>
+                      </div>
+                    )}
+
+                    {!isGenerating && error && (
+                      <div className="mb-4">
+                        <Chip color="danger" variant="solid">
+                          {error}
+                        </Chip>
+                      </div>
+                    )}
+
+                    {!isGenerating && (
+                      <>
+                        <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4 mb-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                行业领域
+                              </p>
+                              <p className="font-medium">
+                                {getIndustryName(selectedIndustry)}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                细分赛道
+                              </p>
+                              <p className="font-medium">
+                                {niches.find((n) => n.id === selectedNiche)?.name}
+                              </p>
+                            </div>
+                            {contentScripts.some((s) => s.trim()) && (
+                              <div className="sm:col-span-2">
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  已提供文案样本
+                                </p>
+                                <p className="font-medium text-success">
+                                  {contentScripts.filter((s) => s.trim()).length} 个
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            细分赛道
-                          </p>
-                          <p className="font-medium">
-                            {niches.find((n) => n.id === selectedNiche)?.name}
-                          </p>
-                        </div>
-                        {contentScripts.some((s) => s.trim()) && (
-                          <div className="sm:col-span-2">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              已提供文案样本
-                            </p>
-                            <p className="font-medium text-success">
-                              {contentScripts.filter((s) => s.trim()).length} 个
+                        {jobId && (
+                          <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                            <p className="text-sm text-blue-700 dark:text-blue-400">
+                              任务已提交，任务ID: <span className="font-mono">{jobId}</span>
                             </p>
                           </div>
                         )}
-                      </div>
-                    </div>
+                      </>
+                    )}
+
                     <div className="flex justify-center gap-4">
                       <Button
                         variant="bordered"
@@ -511,9 +595,11 @@ export default function Home() {
                         color="success"
                         size="lg"
                         onPress={handleComplete}
+                        isLoading={isGenerating}
+                        isDisabled={isGenerating}
                         className="w-full sm-w-auto text-white"
                       >
-                        获取选题建议
+                        {isGenerating ? "正在生成..." : "获取选题建议"}
                       </Button>
                     </div>
                   </CardBody>
