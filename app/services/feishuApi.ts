@@ -1,7 +1,7 @@
-import { FeishuTaskRecord, FeishuTopicResult } from '../types/topic';
+import { FeishuTaskRecord, FeishuTopicResult } from "../types/topic";
 
 // 飞书 API 基础 URL
-const FEISHU_API_BASE = 'https://open.feishu.cn/open-apis';
+const FEISHU_API_BASE = "https://open.feishu.cn/open-apis";
 
 // 获取飞书访问令牌
 export async function getFeishuAccessToken(): Promise<string> {
@@ -9,26 +9,32 @@ export async function getFeishuAccessToken(): Promise<string> {
   const appSecret = process.env.FEISHU_SECRET_ACCESS_KEY;
 
   if (!appId || !appSecret) {
-    throw new Error('飞书应用凭证未配置');
+    throw new Error("飞书应用凭证未配置");
   }
 
-  const response = await fetch(`${FEISHU_API_BASE}/auth/v3/app_access_token/internal`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      app_id: appId,
-      app_secret: appSecret,
-    }),
-  });
+  const requestBody = {
+    app_id: appId,
+    app_secret: appSecret,
+  };
+
+
+  const response = await fetch(
+    `${FEISHU_API_BASE}/auth/v3/app_access_token/internal`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    }
+  );
 
   if (!response.ok) {
     throw new Error(`获取飞书访问令牌失败: ${response.status}`);
   }
 
   const data = await response.json();
-  
+
   if (data.code !== 0) {
     throw new Error(`飞书 API 错误: ${data.msg}`);
   }
@@ -37,31 +43,33 @@ export async function getFeishuAccessToken(): Promise<string> {
 }
 
 // 查询任务状态表
-export async function searchTaskStatus(jobId: string): Promise<FeishuTaskRecord | null> {
+export async function searchTaskStatus(
+  jobId: string
+): Promise<FeishuTaskRecord | null> {
   const token = await getFeishuAccessToken();
   const appToken = process.env.FEISHU_APP_TOKEN;
   const tableId = process.env.FEISHU_TABLE_ID_TASK;
 
   if (!appToken || !tableId) {
-    throw new Error('飞书表格配置未完成');
+    throw new Error("飞书表格配置未完成");
   }
 
   // 使用飞书多维表格搜索 API
   const response = await fetch(
     `${FEISHU_API_BASE}/bitable/v1/apps/${appToken}/tables/${tableId}/records/search`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         filter: {
-          conjunction: 'and',
+          conjunction: "and",
           conditions: [
             {
-              field_name: 'jobId',
-              operator: 'is',
+              field_name: "jobId",
+              operator: "is",
               value: [jobId],
             },
           ],
@@ -87,31 +95,33 @@ export async function searchTaskStatus(jobId: string): Promise<FeishuTaskRecord 
 }
 
 // 查询选题结果表
-export async function searchTopicResults(jobId: string): Promise<FeishuTopicResult[]> {
+export async function searchTopicResults(
+  jobId: string
+): Promise<FeishuTopicResult[]> {
   const token = await getFeishuAccessToken();
   const appToken = process.env.FEISHU_APP_TOKEN;
   const tableId = process.env.FEISHU_TABLE_ID_TOPIC;
 
   if (!appToken || !tableId) {
-    throw new Error('飞书表格配置未完成');
+    throw new Error("飞书表格配置未完成");
   }
 
   // 使用飞书多维表格搜索 API
   const response = await fetch(
     `${FEISHU_API_BASE}/bitable/v1/apps/${appToken}/tables/${tableId}/records/search`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         filter: {
-          conjunction: 'and',
+          conjunction: "and",
           conditions: [
             {
-              field_name: 'jobId',
-              operator: 'is',
+              field_name: "jobId",
+              operator: "is",
               value: [jobId],
             },
           ],
