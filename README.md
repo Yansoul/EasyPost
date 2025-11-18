@@ -57,12 +57,15 @@ pnpm install
 复制示例配置文件：
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env.local
 ```
 
 编辑 `.env.local` 文件，填入你的凭证信息：
 
 ```bash
+# Webhook API 地址（必填）
+NEXT_PUBLIC_WEBHOOK_API_URL=http://localhost:5678  # 本地开发使用 localhost
+
 # TikHub API 配置（可选，用于获取抖音行业分类数据）
 TIKUB_API_KEY=your_tikhub_api_key_here
 
@@ -88,6 +91,35 @@ pnpm dev
 
 ### 生产部署
 
+#### 部署到 Vercel（推荐）
+
+1. **连接 GitHub 仓库**
+   - 登录 [Vercel](https://vercel.com)
+   - 导入你的 GitHub 项目
+   - Vercel 会自动检测 Next.js 项目
+
+2. **配置环境变量**
+   
+   在 Vercel 项目设置的 "Environment Variables" 中添加以下变量：
+   
+   ```
+   NEXT_PUBLIC_WEBHOOK_API_URL=https://your-aliyun-server.com
+   FEISHU_ACCESS_KEY_ID=your_feishu_access_key_id_here
+   FEISHU_SECRET_ACCESS_KEY=your_feishu_secret_access_key_here
+   FEISHU_APP_TOKEN=your_feishu_app_token_here
+   FEISHU_TABLE_ID_TASK=your_task_table_id_here
+   FEISHU_TABLE_ID_TOPIC=your_topic_table_id_here
+   ```
+   
+   > ⚠️ **注意**：`NEXT_PUBLIC_WEBHOOK_API_URL` 在生产环境中应该设置为你的阿里云服务器地址，而不是 localhost
+
+3. **部署项目**
+   - 点击 "Deploy" 按钮
+   - Vercel 会自动构建和部署你的应用
+   - 部署完成后会生成一个可访问的 URL
+
+#### 手动部署
+
 1. **构建应用**
 
 ```bash
@@ -99,6 +131,8 @@ pnpm build
 ```bash
 pnpm start
 ```
+
+> 💡 **提示**：手动部署时，需要在服务器上设置对应的环境变量
 
 ## 功能详解
 

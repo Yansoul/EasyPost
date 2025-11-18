@@ -174,7 +174,7 @@ export default function Home() {
 
       console.log("发送请求数据:", requestData);
 
-      const response = await fetch("http://localhost:5678/webhook-test/topic-helper", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_WEBHOOK_API_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
