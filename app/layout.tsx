@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Media Auto Demo",
+  title: "Easy Post",
   description: "Created with Next.js, TypeScript, and Tailwind CSS",
 };
 

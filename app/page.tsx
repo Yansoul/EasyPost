@@ -16,6 +16,7 @@ import {
 } from "@heroui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useFeishuPolling } from "./hooks/useFeishuPolling";
+import { useBeforeUnload } from "./hooks/useBeforeUnload";
 import { TopicResultCard } from "./components/TopicResultCard";
 import { PollingState } from "./types/topic";
 
@@ -63,6 +64,9 @@ export default function Home() {
     startPolling,
     stopPolling,
   } = useFeishuPolling();
+
+  // 从第3步开始启用离开页面警告
+  useBeforeUnload(currentStep >= 3);
 
   useEffect(() => {
     loadIndustries();
@@ -161,13 +165,13 @@ export default function Home() {
                 {
                   label: nicheName,
                   value: parseInt(selectedNiche),
-                }
+                },
               ],
               count: 0,
               label: selectedIndustryName,
               value: parseInt(selectedIndustry),
-            }
-          }
+            },
+          },
         ],
         userHistory: contentScripts.filter((s) => s.trim()),
       };
@@ -190,7 +194,11 @@ export default function Home() {
       console.log("📦 API 完整响应:", JSON.stringify(result, null, 2));
 
       // 尝试多种可能的响应格式
-      let extractedJobId = result.jobId || result.job_id || result.data?.jobId || result.data?.job_id;
+      let extractedJobId =
+        result.jobId ||
+        result.job_id ||
+        result.data?.jobId ||
+        result.data?.job_id;
       let extractedStatus = result.status || result.data?.status;
 
       console.log("🔍 提取的 jobId:", extractedJobId);
@@ -205,7 +213,9 @@ export default function Home() {
           receivedKeys: Object.keys(result),
           fullResponse: result,
         });
-        throw new Error(`无效的响应格式：缺少 jobId。响应内容: ${JSON.stringify(result)}`);
+        throw new Error(
+          `无效的响应格式：缺少 jobId。响应内容: ${JSON.stringify(result)}`
+        );
       }
     } catch (err) {
       console.error("❌ 获取选题建议失败:", err);
@@ -581,7 +591,10 @@ export default function Home() {
                                 细分赛道
                               </p>
                               <p className="font-medium">
-                                {niches.find((n) => n.id === selectedNiche)?.name}
+                                {
+                                  niches.find((n) => n.id === selectedNiche)
+                                    ?.name
+                                }
                               </p>
                             </div>
                             {contentScripts.some((s) => s.trim()) && (
@@ -590,7 +603,11 @@ export default function Home() {
                                   已提供文案样本
                                 </p>
                                 <p className="font-medium text-success">
-                                  {contentScripts.filter((s) => s.trim()).length} 个
+                                  {
+                                    contentScripts.filter((s) => s.trim())
+                                      .length
+                                  }{" "}
+                                  个
                                 </p>
                               </div>
                             )}
@@ -599,7 +616,8 @@ export default function Home() {
                         {jobId && (
                           <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                             <p className="text-sm text-blue-700 dark:text-blue-400">
-                              任务已提交，任务ID: <span className="font-mono">{jobId}</span>
+                              任务已提交，任务ID:{" "}
+                              <span className="font-mono">{jobId}</span>
                             </p>
                           </div>
                         )}
@@ -615,13 +633,20 @@ export default function Home() {
                               <Spinner size="sm" color="primary" />
                               <div className="flex-1">
                                 <p className="font-medium text-gray-800 dark:text-white">
-                                  {pollingState === PollingState.CHECKING_STATUS && "正在检查任务状态..."}
-                                  {pollingState === PollingState.POLLING_RESULTS && "正在获取选题结果..."}
-                                  {pollingState === PollingState.FINISHED && "✅ 轮询完成！"}
-                                  {pollingState === PollingState.ERROR && "❌ 轮询出错"}
+                                  {pollingState ===
+                                    PollingState.CHECKING_STATUS &&
+                                    "正在检查任务状态..."}
+                                  {pollingState ===
+                                    PollingState.POLLING_RESULTS &&
+                                    "正在获取选题结果..."}
+                                  {pollingState === PollingState.FINISHED &&
+                                    "✅ 轮询完成！"}
+                                  {pollingState === PollingState.ERROR &&
+                                    "❌ 轮询出错"}
                                 </p>
                                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                  已获取 {topicResults.length} 条选题 · 第 {attemptCount} 次查询
+                                  已获取 {topicResults.length} 条选题 · 第{" "}
+                                  {attemptCount} 次查询
                                 </p>
                               </div>
                             </div>
@@ -683,17 +708,18 @@ export default function Home() {
                           </Button>
                         </>
                       )}
-                      {pollingState !== PollingState.IDLE && pollingState !== PollingState.FINISHED && (
-                        <Button
-                          color="warning"
-                          variant="flat"
-                          size="lg"
-                          onPress={stopPolling}
-                          className="w-full sm:w-auto"
-                        >
-                          停止轮询
-                        </Button>
-                      )}
+                      {pollingState !== PollingState.IDLE &&
+                        pollingState !== PollingState.FINISHED && (
+                          <Button
+                            color="warning"
+                            variant="flat"
+                            size="lg"
+                            onPress={stopPolling}
+                            className="w-full sm:w-auto"
+                          >
+                            停止轮询
+                          </Button>
+                        )}
                       {pollingState === PollingState.FINISHED && (
                         <Button
                           color="success"
