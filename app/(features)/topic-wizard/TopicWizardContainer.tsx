@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, memo } from 'react';
-import { Card } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Card } from '@heroui/react';
 import { WizardProvider } from './context/WizardProvider';
 import { useWizardContext } from './context/WizardContext';
 import { WizardStepper } from './components/WizardStepper';
@@ -64,38 +64,41 @@ const WizardContent = memo(function WizardContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+      <div className="max-w-3xl mx-auto">
         {/* 顶部标题 */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-8"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16"
         >
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
             AI 自媒体选题助手
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto">
             智能分析您的领域，提供优质选题建议
           </p>
         </motion.div>
 
         {/* 步骤指示器 */}
-        <WizardStepper currentStep={state.currentStep} />
+        <div className="mb-16">
+          <WizardStepper currentStep={state.currentStep} />
+        </div>
 
         {/* 主要内容 */}
         <AnimatePresence mode="wait">
           <motion.div
             key={state.currentStep}
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.4 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.3 }}
           >
-            <Card className="w-full max-w-2xl mx-auto">
+            {/* 卡片包裹 */}
+            <Card className="w-full mx-auto bg-white dark:bg-gray-950 rounded-2xl shadow-sm border border-stone-200/50 dark:border-gray-800 overflow-hidden">
               {state.loading ? (
-                <div className="py-8 flex justify-center">
+                <div className="py-12 flex justify-center">
                   <LoadingSpinner />
                 </div>
               ) : (
@@ -117,17 +120,17 @@ export default function TopicWizardContainer() {
   return (
     <ErrorBoundary
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20 p-4">
-          <div className="text-center">
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-950 p-4">
+          <div className="text-center max-w-md mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              选题向导加载失败
+              应用遇到问题
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              请刷新页面重试
+            <p className="text-gray-500 dark:text-gray-400 mb-8">
+              请刷新页面重试。如果问题持续存在，请联系支持。
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-success text-white rounded-lg hover:bg-success-600 transition-colors"
+              className="px-6 py-2.5 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-md hover:opacity-90 transition-opacity font-medium text-sm"
             >
               刷新页面
             </button>
@@ -141,4 +144,3 @@ export default function TopicWizardContainer() {
     </ErrorBoundary>
   );
 }
-
