@@ -63,9 +63,12 @@ const WizardContent = memo(function WizardContent() {
     }
   };
 
+  // 是否显示宽屏模式（当有结果展示时）
+  const isWideMode = state.topicResults.length > 0 && state.currentStep === 4;
+
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-3xl mx-auto">
+      <div className={`mx-auto transition-all duration-500 ${isWideMode ? 'max-w-7xl' : 'max-w-3xl'}`}>
         {/* 顶部标题 */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

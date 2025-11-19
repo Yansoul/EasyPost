@@ -46,7 +46,21 @@ export function useFeishuPolling(config: Partial<PollingConfig> = {}): UseFeishu
       }
 
       const data = await response.json();
-      return data.status || 'processing';
+      
+      // 处理状态值，兼容不同格式
+      let status = data.status || 'processing';
+      
+      // 如果是数组（多选/单选字段可能是数组），取第一个
+      if (Array.isArray(status)) {
+        status = status[0];
+      }
+      
+      // 如果是对象（可能是包含text/id的对象），尝试取text
+      if (typeof status === 'object' && status !== null) {
+        status = status.text || status.value || JSON.stringify(status);
+      }
+
+      return String(status).toLowerCase() as 'processing' | 'finished' | 'error';
     } catch (err) {
       console.error('检查任务状态失败:', err);
       // 单次失败不中断轮询
@@ -99,8 +113,10 @@ export function useFeishuPolling(config: Partial<PollingConfig> = {}): UseFeishu
     // 1. 先检查任务状态
     setPollingState(PollingState.CHECKING_STATUS);
     const taskStatus = await checkTaskStatus(jobId);
+    console.log(`[Polling] Job: ${jobId}, Status: ${taskStatus}, Attempt: ${attemptCount + 1}`);
 
     if (taskStatus === 'finished') {
+      console.log('[Polling] Task finished, fetching final results...');
       // 任务完成，最后获取一次结果然后停止
       setPollingState(PollingState.POLLING_RESULTS);
       const results = await fetchTopicResults(jobId);
@@ -145,6 +161,7 @@ export function useFeishuPolling(config: Partial<PollingConfig> = {}): UseFeishu
       return;
     }
 
+    console.log('[Polling] Starting polling for job:', jobId);
     // 重置状态
     jobIdRef.current = jobId;
     startTimeRef.current = Date.now();
@@ -163,6 +180,7 @@ export function useFeishuPolling(config: Partial<PollingConfig> = {}): UseFeishu
 
   // 停止轮询
   const stopPolling = useCallback(() => {
+    console.log('[Polling] Stopping polling');
     clearTimer();
     setPollingState(PollingState.IDLE);
   }, [clearTimer]);
